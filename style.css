@@ -1,0 +1,54 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #111;
+  height: 100%;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+/* 控制栏 */
+.control-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #222;
+  color: white;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.control-bar select,
+.control-bar button {
+  margin-right: 10px;
+}
+
+.speed-info {
+  margin-left: 20px;
+  color: #aaa;
+}
+
+/* PDF 显示区 */
+#viewer {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  width: 100%;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+/* PDF canvas */
+canvas {
+  display: block;
+  margin: 0 auto 20px;
+}
+
+/* 隐藏控制栏（演出模式） */
+.hide-controls .control-bar {
+  display: none;
+}
+
+.hide-controls #viewer {
+  top: 0;
+}

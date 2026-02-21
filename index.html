@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>戏曲看谱</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #controls {
+      padding: 10px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #viewer {
+      flex: 1;
+      overflow-y: auto;
+      background: black;
+      text-align: center;
+    }
+
+    canvas {
+      margin: 10px auto;
+      display: block;
+    }
+
+    select, button {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+
+    #speedBox {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="controls">
+    <select id="operaSelect"></select>
+    <select id="songSelect"></select>
+
+    <button id="btnStart">开始</button>
+    <button id="btnPause">暂停</button>
+
+    <span id="speedBox">
+      速度：<span id="speedDisplay">1</span> 档
+    </span>
+  </div>
+
+  <div id="viewer"></div>
+
+  <script src="app.js"></script>
+
+  <!-- 注册 Service Worker -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(function (registration) {
+        console.log('Service Worker 注册成功');
+      })
+      .catch(function (error) {
+        console.log('Service Worker 注册失败:', error);
+      });
+  });
+}
+</script>
+
+</body>
+</html>
