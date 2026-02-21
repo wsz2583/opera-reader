@@ -1,13 +1,12 @@
-const CACHE_NAME = 'opera-reader-v4';
+const CACHE_NAME = 'opera-reader-v5';
 
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-512.png'
+  '/opera-reader/',
+  '/opera-reader/index.html',
+  '/opera-reader/manifest.json',
+  '/opera-reader/icon-512.png'
 ];
 
-// 安装
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,7 +18,6 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// 激活
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -35,7 +33,6 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// 请求拦截
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
