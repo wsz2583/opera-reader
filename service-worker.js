@@ -1,10 +1,10 @@
 const CACHE_NAME = 'opera-reader-v4';
 
 const urlsToCache = [
-  '/opera-reader/',
-  '/opera-reader/index.html',
-  '/opera-reader/manifest.json',
-  '/opera-reader/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-512.png'
 ];
 
 // 安装

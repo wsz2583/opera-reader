@@ -1,0 +1,5 @@
+以后你只需要：
+git add .
+git commit -m "修改说明"
+git push
+就会自动更新网站。
