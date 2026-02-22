@@ -1,4 +1,4 @@
-const CACHE_NAME = 'opera-reader-v5';
+const CACHE_NAME = 'opera-reader-v6';
 
 const urlsToCache = [
   '/opera-reader/',
@@ -11,8 +11,14 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('缓存核心文件...');
+        console.log('开始缓存...');
         return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        console.log('缓存成功 ✅');
+      })
+      .catch(err => {
+        console.error('缓存失败 ❌', err);
       })
   );
   self.skipWaiting();
