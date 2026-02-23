@@ -4,6 +4,7 @@ const urlsToCache = [
   '/opera-reader/',
   '/opera-reader/index.html',
   '/opera-reader/manifest.json',
+  '/opera-reader/pdf.min.js',
   '/opera-reader/icon-512.png'
 ];
 
