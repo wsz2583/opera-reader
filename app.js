@@ -5,8 +5,8 @@ const btnStart = document.getElementById("btnStart");
 const btnPause = document.getElementById("btnPause");
 const speedDisplay = document.getElementById("speedDisplay");
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+// ✅ 使用本地 worker（真正离线）
+pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
 
 
 // ===== 可调参数 =====
@@ -69,25 +69,36 @@ async function loadPDF(url) {
   viewer.innerHTML = "";
   viewer.scrollTop = 0;
 
-  const loadingTask = pdfjsLib.getDocument(encodeURI(url));
-  const pdf = await loadingTask.promise;
+  try {
 
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 1.5 });
+    const loadingTask = pdfjsLib.getDocument({
+      url: encodeURI(url)
+    });
 
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+    const pdf = await loadingTask.promise;
 
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
 
-    viewer.appendChild(canvas);
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 1.5 });
 
-    await page.render({
-      canvasContext: context,
-      viewport: viewport
-    }).promise;
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      viewer.appendChild(canvas);
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+    }
+
+  } catch (error) {
+    console.error("PDF 加载失败:", error);
+    viewer.innerHTML = "<p style='color:red;text-align:center;'>PDF 加载失败（可能离线资源未缓存）</p>";
   }
 }
 
@@ -98,7 +109,6 @@ function startScroll() {
   if (scrollInterval) return;
 
   let intervalTime = baseInterval - (speedLevel - 1) * stepInterval;
-
   if (intervalTime < 10) intervalTime = 10;
 
   scrollInterval = setInterval(() => {
