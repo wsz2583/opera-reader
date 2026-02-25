@@ -1,11 +1,17 @@
-const CACHE_NAME = 'opera-reader-v6';
+const CACHE_NAME = 'opera-reader-v8';
 
 const urlsToCache = [
   '/opera-reader/',
   '/opera-reader/index.html',
   '/opera-reader/manifest.json',
   '/opera-reader/pdf.min.js',
-  '/opera-reader/icon-512.png'
+  '/opera-reader/pdf.worker.min.js',
+  '/opera-reader/icon-512.png',
+
+  '/opera-reader/朝阳沟/亲家母对唱.pdf',
+  '/opera-reader/朝阳沟/银环上山.pdf',
+  '/opera-reader/泪洒相思地/选段1.pdf',
+  '/opera-reader/泪洒相思地/选段2.pdf'
 ];
 
 self.addEventListener('install', event => {
