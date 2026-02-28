@@ -9,10 +9,10 @@ const speedDisplay = document.getElementById("speedDisplay");
 pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
 
 
-// ===== 可调参数 =====
-let baseInterval = 300;   // 1档间隔
-let stepInterval = 50;    // 每升一档减少
-let speedLevel = 1;       // 当前档位
+// ===== 可调参数（完全不动你的速度逻辑）=====
+let baseInterval = 300;
+let stepInterval = 50;
+let speedLevel = 1;
 let scrollInterval = null;
 
 
@@ -27,6 +27,12 @@ const library = {
     { title: "选段2", file: "泪洒相思地/选段2.pdf" }
   ]
 };
+
+
+// ===== 生成存储 key（按曲目分别保存）=====
+function getStorageKey(file) {
+  return "scroll_" + file;
+}
 
 
 // ===== 初始化 =====
@@ -96,6 +102,12 @@ async function loadPDF(url) {
       }).promise;
     }
 
+    // ✅ PDF 全部渲染完后恢复滚动位置
+    const saved = localStorage.getItem(getStorageKey(url));
+    if (saved) {
+      viewer.scrollTop = parseInt(saved);
+    }
+
   } catch (error) {
     console.error("PDF 加载失败:", error);
     viewer.innerHTML = "<p style='color:red;text-align:center;'>PDF 加载失败（可能离线资源未缓存）</p>";
@@ -103,7 +115,17 @@ async function loadPDF(url) {
 }
 
 
-// ===== 滚动 =====
+// ===== 自动保存滚动位置（核心新增）=====
+viewer.addEventListener("scroll", function () {
+  const currentFile = songSelect.value;
+  localStorage.setItem(
+    getStorageKey(currentFile),
+    viewer.scrollTop
+  );
+});
+
+
+// ===== 滚动（完全保留你的原始算法）=====
 function startScroll() {
 
   if (scrollInterval) return;
