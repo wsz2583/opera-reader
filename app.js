@@ -197,15 +197,22 @@ btnStart.addEventListener("click", startScroll);
 btnPause.addEventListener("click", stopScroll);
 
 // ===== 搜索功能 =====
-const searchInput = document.getElementById("searchInput");
+document.addEventListener("DOMContentLoaded", function () {
 
-searchInput.addEventListener("input", function () {
-  const keyword = this.value.toLowerCase().trim();
-  
-  for (let option of songSelect.options) {
-    const text = option.text.toLowerCase();
-    option.style.display = text.includes(keyword) ? "" : "none";
-  }
+  const searchInput = document.getElementById("searchInput");
+  const songSelect = document.getElementById("songSelect");
+
+  searchInput.addEventListener("input", function () {
+    const keyword = this.value.toLowerCase().trim();
+
+    for (let i = 0; i < songSelect.options.length; i++) {
+      const option = songSelect.options[i];
+      const text = option.text.toLowerCase();
+
+      option.style.display = text.includes(keyword) ? "" : "none";
+    }
+  });
+
 });
 
 // 启动
