@@ -196,6 +196,17 @@ songSelect.addEventListener("change", () => loadPDF(songSelect.value));
 btnStart.addEventListener("click", startScroll);
 btnPause.addEventListener("click", stopScroll);
 
+// ===== 搜索功能 =====
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", function () {
+  const keyword = this.value.toLowerCase().trim();
+  
+  for (let option of songSelect.options) {
+    const text = option.text.toLowerCase();
+    option.style.display = text.includes(keyword) ? "" : "none";
+  }
+});
 
 // 启动
 initOperaList();
