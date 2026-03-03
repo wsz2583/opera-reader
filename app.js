@@ -69,21 +69,20 @@ function searchAll(keyword) {
     for (let song of library[opera]) {
       if (song.title.includes(keyword)) {
 
-        // 切换剧目
         operaSelect.value = opera;
         updateSongList();
 
-        // 切换唱段
         songSelect.value = song.file;
-
-        // 加载 PDF
         loadPDF(song.file);
+
+        searchInput.blur();  // 👈 新增：隐藏手机键盘
+
         return;
       }
     }
   }
 
-  alert("未找到该唱段");
+  alert("没有找到相关唱段");
 }
 
 // ===== PDF 加载 =====
