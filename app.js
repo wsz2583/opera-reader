@@ -202,14 +202,35 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("searchInput");
   const songSelect = document.getElementById("songSelect");
 
-  searchInput.addEventListener("input", function () {
-    const keyword = this.value.toLowerCase().trim();
+  function filterSongs() {
+    const keyword = searchInput.value.toLowerCase().trim();
+    let firstMatch = null;
 
     for (let i = 0; i < songSelect.options.length; i++) {
       const option = songSelect.options[i];
       const text = option.text.toLowerCase();
 
-      option.style.display = text.includes(keyword) ? "" : "none";
+      if (text.includes(keyword)) {
+        option.style.display = "";
+        if (!firstMatch) firstMatch = option;
+      } else {
+        option.style.display = "none";
+      }
+    }
+
+    // 自动选中第一个匹配项
+    if (firstMatch) {
+      songSelect.value = firstMatch.value;
+    }
+  }
+
+  // 输入时实时过滤
+  searchInput.addEventListener("input", filterSongs);
+
+  // 按 Enter 直接打开
+  searchInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      songSelect.dispatchEvent(new Event("change"));
     }
   });
 
