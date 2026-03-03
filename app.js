@@ -6,10 +6,10 @@ const btnPause = document.getElementById("btnPause");
 const speedDisplay = document.getElementById("speedDisplay");
 const searchInput = document.getElementById("searchInput");
 
-// ✅ 本地 worker，真正离线
+// ✅ 本地 worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
 
-// ===== 滚动参数（❗不改）=====
+// ===== 滚动参数（保持不变）=====
 let baseInterval = 300;
 let stepInterval = 50;
 let speedLevel = 1;
@@ -29,7 +29,6 @@ const library = {
 
 // ===== 初始化 =====
 function initOperaList() {
-  operaSelect.innerHTML = "";
   for (let opera in library) {
     const option = document.createElement("option");
     option.value = opera;
@@ -38,6 +37,11 @@ function initOperaList() {
   }
   updateSongList();
   updateSpeedDisplay();
+
+  // 手机打开自动聚焦
+  if (searchInput) {
+    searchInput.focus();
+  }
 }
 
 function updateSpeedDisplay() {
@@ -60,8 +64,49 @@ function updateSongList() {
   loadPDF(songSelect.value);
 }
 
-// ===== 跨文件夹搜索（核心）=====
+// ===== 加载 PDF =====
+async function loadPDF(url) {
+
+  stopScroll();
+  viewer.innerHTML = "";
+  viewer.scrollTop = 0;
+
+  try {
+
+    const loadingTask = pdfjsLib.getDocument({
+      url: encodeURI(url)
+    });
+
+    const pdf = await loadingTask.promise;
+
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+
+      const page = await pdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 1.5 });
+
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      viewer.appendChild(canvas);
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+    }
+
+  } catch (error) {
+    console.error("PDF 加载失败:", error);
+    viewer.innerHTML = "<p style='color:red;text-align:center;'>PDF 加载失败</p>";
+  }
+}
+
+// ===== 跨文件夹搜索 =====
 function searchAll(keyword) {
+
   keyword = keyword.trim();
   if (!keyword) return;
 
@@ -75,7 +120,9 @@ function searchAll(keyword) {
         songSelect.value = song.file;
         loadPDF(song.file);
 
-        searchInput.blur();  // 👈 新增：隐藏手机键盘
+        // 手机体验优化
+        searchInput.blur();
+        searchInput.value = "";
 
         return;
       }
@@ -85,53 +132,25 @@ function searchAll(keyword) {
   alert("没有找到相关唱段");
 }
 
-// ===== PDF 加载 =====
-async function loadPDF(url) {
-  stopScroll();
-  viewer.innerHTML = "";
-  viewer.scrollTop = 0;
-
-  try {
-    const pdf = await pdfjsLib.getDocument({
-      url: encodeURI(url)
-    }).promise;
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 1.5 });
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      viewer.appendChild(canvas);
-
-      await page.render({
-        canvasContext: ctx,
-        viewport
-      }).promise;
-    }
-  } catch (e) {
-    viewer.innerHTML = "<p style='color:red'>PDF 加载失败</p>";
-  }
-}
-
-// ===== 滚动（原封不动）=====
+// ===== 滚动（完全保持原逻辑）=====
 function startScroll() {
+
   if (scrollInterval) return;
 
   let intervalTime = baseInterval - (speedLevel - 1) * stepInterval;
   if (intervalTime < 10) intervalTime = 10;
 
   scrollInterval = setInterval(() => {
+
     const maxScroll = viewer.scrollHeight - viewer.clientHeight;
+
     if (viewer.scrollTop >= maxScroll) {
       stopScroll();
       return;
     }
+
     viewer.scrollTop += 1;
+
   }, intervalTime);
 }
 
@@ -147,38 +166,49 @@ function restartScroll() {
   }
 }
 
-// ===== 键盘 =====
-document.addEventListener("keydown", e => {
+// ===== 键盘控制 =====
+document.addEventListener("keydown", function (e) {
+
   if (e.code === "Space") {
     e.preventDefault();
     scrollInterval ? stopScroll() : startScroll();
   }
 
-  if (e.code === "ArrowUp" && speedLevel < 10) {
-    speedLevel++;
-    updateSpeedDisplay();
-    restartScroll();
+  if (e.code === "ArrowUp") {
+    if (speedLevel < 10) {
+      speedLevel++;
+      updateSpeedDisplay();
+      restartScroll();
+    }
   }
 
-  if (e.code === "ArrowDown" && speedLevel > 1) {
-    speedLevel--;
-    updateSpeedDisplay();
-    restartScroll();
+  if (e.code === "ArrowDown") {
+    if (speedLevel > 1) {
+      speedLevel--;
+      updateSpeedDisplay();
+      restartScroll();
+    }
+  }
+
+  if (e.key.toLowerCase() === "r") {
+    viewer.scrollTop = 0;
   }
 });
 
-// ===== 事件 =====
+// ===== 搜索回车 =====
+if (searchInput) {
+  searchInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      searchAll(searchInput.value);
+    }
+  });
+}
+
+// ===== 按钮 =====
 operaSelect.addEventListener("change", updateSongList);
 songSelect.addEventListener("change", () => loadPDF(songSelect.value));
 btnStart.addEventListener("click", startScroll);
 btnPause.addEventListener("click", stopScroll);
-
-// 🔍 搜索框回车
-searchInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    searchAll(searchInput.value);
-  }
-});
 
 // 启动
 initOperaList();
